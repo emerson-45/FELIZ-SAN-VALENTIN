@@ -83,12 +83,12 @@
             margin-bottom: 0.8rem;
         }
 
-        /* Álbum de fotos animado */
+        /* Álbum de fotos - contenedor adaptable */
         .album-container {
             width: 100%;
-            max-width: 320px;
+            max-width: 400px; /* Aumentado para dar espacio */
+            height: 350px; /* Altura fija para consistencia */
             margin: 0 auto 1.5rem auto;
-            aspect-ratio: 4 / 3; /* Formato más cuadrado para las fotos */
             border-radius: 32px;
             background: #ffffff;
             box-shadow: 
@@ -116,9 +116,10 @@
         .foto-actual img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* Ajusta la imagen sin recortar, mostrando completa */
+            background-color: #ffd9e8; /* Color de fondo por si hay espacios */
             display: block;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.3s ease;
         }
 
         /* Control de música */
@@ -205,15 +206,22 @@
             }
         }
 
-        #audioFondo {
-            display: none;
+        #youtube-player {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
         }
 
         @media (max-width: 500px) {
             h1 { font-size: 3.2rem; }
             .card { padding: 2rem 1.2rem; }
             .mensaje-amistad { font-size: 1.1rem; padding: 1.2rem; }
-            .album-container { max-width: 280px; }
+            .album-container { 
+                max-width: 320px; 
+                height: 280px;
+            }
             .control-musica { padding: 0.4rem 1.2rem; }
             .icono-musica { font-size: 1.8rem; }
             .estado-musica { font-size: 1rem; }
@@ -223,10 +231,8 @@
 <body>
     <div class="corazones-container" id="corazonesContainer"></div>
 
-    <!-- Audio con la canción de Zoe -->
-    <audio id="audioFondo" loop autoplay>
-       <source src="zoe.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Reproductor de YouTube invisible -->
+    <div id="youtube-player"></div>
 
     <div class="card">
         <h1>Feliz San Valentín</h1>
@@ -237,10 +243,10 @@
             Gracias por ser mi mejor amiga y por siempre estar conmigo.<br><br>
             Que este Día de San Valentín esté lleno de alegría,<br>
             como la que tú siempre regalas. 💜<br><br>
-            ¡Feliz Día de San Valentín! ING
+            Feliz Día de San Valentín, te quiero mucho
         </div>
 
-        <!-- Álbum de fotos animado -->
+        <!-- Álbum de fotos adaptable -->
         <div class="album-container">
             <div class="foto-actual" id="fotoActual">
                 <img id="albumImg" src="20250804_112846.jpg" alt="Foto Nayelly">
@@ -259,11 +265,14 @@
         </div>
     </div>
 
+    <!-- API de YouTube -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    
     <script>
         (function() {
             const container = document.getElementById('corazonesContainer');
             
-            // ÁLBUM DE FOTOS ANIMADO
+            // ÁLBUM DE FOTOS ANIMADO - con imágenes mixtas
             const imagenes = [
                 '20250804_112846.jpg',
                 'PSX_1754331286286.jpg',
@@ -275,59 +284,81 @@
             let indiceActual = 0;
             const albumImg = document.getElementById('albumImg');
             
+            // Precargar imágenes para que no parpadeen
+            imagenes.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+            
             // Cambiar imagen cada 1.5 segundos
             setInterval(() => {
                 indiceActual = (indiceActual + 1) % imagenes.length;
-                albumImg.src = imagenes[indiceActual];
-                // Pequeña animación de fade
-                albumImg.style.opacity = '0.7';
+                albumImg.style.opacity = '0.5';
+                setTimeout(() => {
+                    albumImg.src = imagenes[indiceActual];
+                }, 100);
                 setTimeout(() => {
                     albumImg.style.opacity = '1';
-                }, 150);
+                }, 200);
             }, 1500);
 
-            // CONTROL DE MÚSICA
-            const audio = document.getElementById('audioFondo');
+            // CONTROL DE MÚSICA CON YOUTUBE
+            let player;
+            let musicaActiva = true;
+            let playerListo = false;
+
+            window.onYouTubeIframeAPIReady = function() {
+                player = new YT.Player('youtube-player', {
+                    height: '0',
+                    width: '0',
+                    videoId: 'v2LFL9S33UI', // Labios Rotos - Zoé
+                    playerVars: {
+                        'autoplay': 1,
+                        'loop': 1,
+                        'playlist': 'v2LFL9S33UI',
+                        'controls': 0,
+                        'showinfo': 0,
+                        'rel': 0,
+                        'iv_load_policy': 3
+                    },
+                    events: {
+                        'onReady': onPlayerReady
+                    }
+                });
+            };
+
+            function onPlayerReady(event) {
+                playerListo = true;
+                player.playVideo();
+            }
+
             const controlMusica = document.getElementById('controlMusica');
             const iconoMusica = document.getElementById('iconoMusica');
             const textoMusica = document.getElementById('textoMusica');
-            
-            let musicaActiva = true;
 
             controlMusica.addEventListener('click', function() {
+                if (!playerListo) return;
+                
                 if (musicaActiva) {
-                    audio.pause();
+                    player.pauseVideo();
                     iconoMusica.textContent = '🔇';
                     textoMusica.textContent = 'Sonido silenciado';
                     musicaActiva = false;
                 } else {
-                    audio.play().catch(e => console.log('Error al reproducir'));
+                    player.playVideo();
                     iconoMusica.textContent = '🔊';
                     textoMusica.textContent = 'Sonido activado';
                     musicaActiva = true;
                 }
             });
 
-            // Intentar reproducir audio automáticamente
-            function intentarReproducirAudio() {
-                audio.play().catch(e => {
-                    console.log("Autoplay bloqueado, esperando interacción");
-                    textoMusica.textContent = 'Haz clic para activar';
-                    iconoMusica.textContent = '🔇';
-                    musicaActiva = false;
-                });
-            }
-            
-            window.addEventListener('load', intentarReproducirAudio);
-            
-            // Activar audio con el primer clic si está bloqueado
+            // Activar con el primer clic si es necesario
             document.body.addEventListener('click', function activarPorClick() {
-                if (!musicaActiva && audio.paused) {
-                    audio.play().then(() => {
-                        iconoMusica.textContent = '🔊';
-                        textoMusica.textContent = 'Sonido activado';
-                        musicaActiva = true;
-                    }).catch(e => console.log('Error al reproducir'));
+                if (playerListo && !musicaActiva) {
+                    player.playVideo();
+                    iconoMusica.textContent = '🔊';
+                    textoMusica.textContent = 'Sonido activado';
+                    musicaActiva = true;
                 }
             }, { once: true });
 
@@ -368,10 +399,8 @@
                 }, (duracion + retardo) * 1000 + 300);
             }
 
-            // Iniciar corazones automáticos
             setInterval(crearCorazon, 1500);
 
-            // Crear unos cuantos al inicio
             for (let i = 0; i < 10; i++) {
                 setTimeout(() => crearCorazon(), i * 200);
             }
