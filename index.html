@@ -86,8 +86,8 @@
         /* Álbum de fotos - contenedor adaptable */
         .album-container {
             width: 100%;
-            max-width: 400px; /* Aumentado para dar espacio */
-            height: 350px; /* Altura fija para consistencia */
+            max-width: 400px;
+            height: 350px;
             margin: 0 auto 1.5rem auto;
             border-radius: 32px;
             background: #ffffff;
@@ -116,8 +116,8 @@
         .foto-actual img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Ajusta la imagen sin recortar, mostrando completa */
-            background-color: #ffd9e8; /* Color de fondo por si hay espacios */
+            object-fit: contain;
+            background-color: #ffd9e8;
             display: block;
             transition: opacity 0.3s ease;
         }
@@ -206,12 +206,9 @@
             }
         }
 
-        #youtube-player {
-            position: absolute;
-            width: 0;
-            height: 0;
-            opacity: 0;
-            pointer-events: none;
+        /* Audio MP3 local */
+        #audioFondo {
+            display: none;
         }
 
         @media (max-width: 500px) {
@@ -231,8 +228,11 @@
 <body>
     <div class="corazones-container" id="corazonesContainer"></div>
 
-    <!-- Reproductor de YouTube invisible -->
-    <div id="youtube-player"></div>
+    <!-- Audio MP3 local (zoe.mp3) -->
+    <audio id="audioFondo" loop preload="auto">
+        <source src="zoe.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
 
     <div class="card">
         <h1>Feliz San Valentín</h1>
@@ -265,14 +265,11 @@
         </div>
     </div>
 
-    <!-- API de YouTube -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-    
     <script>
         (function() {
             const container = document.getElementById('corazonesContainer');
             
-            // ÁLBUM DE FOTOS ANIMADO - con imágenes mixtas
+            // ÁLBUM DE FOTOS
             const imagenes = [
                 '20250804_112846.jpg',
                 'PSX_1754331286286.jpg',
@@ -284,7 +281,7 @@
             let indiceActual = 0;
             const albumImg = document.getElementById('albumImg');
             
-            // Precargar imágenes para que no parpadeen
+            // Precargar imágenes
             imagenes.forEach(src => {
                 const img = new Image();
                 img.src = src;
@@ -302,63 +299,59 @@
                 }, 200);
             }, 1500);
 
-            // CONTROL DE MÚSICA CON YOUTUBE
-            let player;
-            let musicaActiva = true;
-            let playerListo = false;
-
-            window.onYouTubeIframeAPIReady = function() {
-                player = new YT.Player('youtube-player', {
-                    height: '0',
-                    width: '0',
-                    videoId: 'v2LFL9S33UI', // Labios Rotos - Zoé
-                    playerVars: {
-                        'autoplay': 1,
-                        'loop': 1,
-                        'playlist': 'v2LFL9S33UI',
-                        'controls': 0,
-                        'showinfo': 0,
-                        'rel': 0,
-                        'iv_load_policy': 3
-                    },
-                    events: {
-                        'onReady': onPlayerReady
-                    }
-                });
-            };
-
-            function onPlayerReady(event) {
-                playerListo = true;
-                player.playVideo();
-            }
-
+            // CONTROL DE MÚSICA CON MP3 LOCAL Y AUTOPLAY FORZADO
+            const audio = document.getElementById('audioFondo');
             const controlMusica = document.getElementById('controlMusica');
             const iconoMusica = document.getElementById('iconoMusica');
             const textoMusica = document.getElementById('textoMusica');
+            
+            let musicaActiva = true;
 
+            // Función para intentar reproducir
+            function intentarReproducir() {
+                audio.play().then(() => {
+                    console.log("Audio reproduciendo correctamente");
+                    iconoMusica.textContent = '🔊';
+                    textoMusica.textContent = 'Sonido activado';
+                    musicaActiva = true;
+                }).catch(error => {
+                    console.log("Autoplay bloqueado:", error);
+                    textoMusica.textContent = 'Haz clic para activar';
+                    iconoMusica.textContent = '🔇';
+                    musicaActiva = false;
+                });
+            }
+
+            // Intentar reproducir cuando cargue la página
+            window.addEventListener('load', function() {
+                // Pequeño retraso para asegurar que el audio está cargado
+                setTimeout(intentarReproducir, 500);
+            });
+
+            // Control manual con el botón
             controlMusica.addEventListener('click', function() {
-                if (!playerListo) return;
-                
                 if (musicaActiva) {
-                    player.pauseVideo();
+                    audio.pause();
                     iconoMusica.textContent = '🔇';
                     textoMusica.textContent = 'Sonido silenciado';
                     musicaActiva = false;
                 } else {
-                    player.playVideo();
-                    iconoMusica.textContent = '🔊';
-                    textoMusica.textContent = 'Sonido activado';
-                    musicaActiva = true;
+                    audio.play().then(() => {
+                        iconoMusica.textContent = '🔊';
+                        textoMusica.textContent = 'Sonido activado';
+                        musicaActiva = true;
+                    }).catch(e => console.log('Error al reproducir'));
                 }
             });
 
-            // Activar con el primer clic si es necesario
+            // Si el usuario hace clic en cualquier parte, activar el audio si está silenciado
             document.body.addEventListener('click', function activarPorClick() {
-                if (playerListo && !musicaActiva) {
-                    player.playVideo();
-                    iconoMusica.textContent = '🔊';
-                    textoMusica.textContent = 'Sonido activado';
-                    musicaActiva = true;
+                if (!musicaActiva && audio.paused) {
+                    audio.play().then(() => {
+                        iconoMusica.textContent = '🔊';
+                        textoMusica.textContent = 'Sonido activado';
+                        musicaActiva = true;
+                    }).catch(e => console.log('Error al reproducir'));
                 }
             }, { once: true });
 
