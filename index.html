@@ -1,1 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Para Nayelly - San Valentín</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #ffe6f0 0%, #ffd9e8 50%, #ffcce0 100%);
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .card {
+            max-width: 650px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(200, 100, 150, 0.25);
+            padding: 2.5rem 2.2rem;
+            border: 3px solid rgba(255, 200, 220, 0.8);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.8rem;
+            font-weight: 400;
+            background: linear-gradient(135deg, #c44f8c, #e36b9e, #ff8ab2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+            text-shadow: 2px 2px 15px rgba(200, 100, 150, 0.3);
+            line-height: 1.2;
+            word-break: keep-all;
+            white-space: normal;
+            max-width: 100%;
+            display: inline-block;
+        }
+
+        .mensaje-amistad {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #4a2a3a;
+            background: rgba(255, 240, 245, 0.9);
+            padding: 1.5rem 1.8rem;
+            border-radius: 50px;
+            box-shadow: 0 8px 18px rgba(180, 100, 130, 0.15);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            border: 2px solid white;
+            text-align: center;
+        }
+
+        .mensaje-amistad span {
+            display: inline-block;
+            background: #ffc1d0;
+            border-radius: 40px;
+            padding: 0.2rem 1rem;
+            color: #8f4763;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Álbum de fotos animado */
+        .album-container {
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 1.5rem auto;
+            aspect-ratio: 4 / 3; /* Formato más cuadrado para las fotos */
+            border-radius: 32px;
+            background: #ffffff;
+            box-shadow: 
+                0 0 0 5px white,
+                0 0 0 10px #ffd9e8,
+                0 20px 30px -8px #c48aa9;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .foto-actual {
+            width: 100%;
+            height: 100%;
+            border-radius: 22px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffeef2;
+        }
+
+        .foto-actual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Control de música */
+        .control-musica {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem auto 1rem;
+            background: rgba(255, 200, 220, 0.5);
+            padding: 0.5rem 1.8rem;
+            border-radius: 60px;
+            width: fit-content;
+            border: 2px solid #ffb6c1;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .control-musica:hover {
+            background: rgba(255, 180, 200, 0.7);
+            transform: scale(1.02);
+        }
+        
+        .icono-musica {
+            font-size: 2rem;
+            color: #b35f7c;
+        }
+        
+        .estado-musica {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #8f4763;
+            letter-spacing: 0.5px;
+        }
+
+        .texto-musica {
+            color: #a55a77; 
+            font-size: 0.9rem; 
+            margin-top: 0.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dedicatoria {
+            font-size: 1.2rem;
+            color: #6a3d52;
+            font-weight: 500;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #ffc0d0;
+        }
+
+        .corazones-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .corazon {
+            position: absolute;
+            bottom: -10vh;
+            font-size: 2.2rem;
+            animation: flotar-corazon 8s linear forwards;
+            filter: drop-shadow(0 0 8px #ffb3c6);
+            user-select: none;
+            opacity: 0.6;
+        }
+
+        @keyframes flotar-corazon {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-120vh) rotate(15deg) scale(0.4);
+                opacity: 0;
+            }
+        }
+
+        #audioFondo {
+            display: none;
+        }
+
+        @media (max-width: 500px) {
+            h1 { font-size: 3.2rem; }
+            .card { padding: 2rem 1.2rem; }
+            .mensaje-amistad { font-size: 1.1rem; padding: 1.2rem; }
+            .album-container { max-width: 280px; }
+            .control-musica { padding: 0.4rem 1.2rem; }
+            .icono-musica { font-size: 1.8rem; }
+            .estado-musica { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="corazones-container" id="corazonesContainer"></div>
+
+    <!-- Audio con la canción de Zoe -->
+    <audio id="audioFondo" loop autoplay>
+        <source src="ytmp3free.cc_labios-rotos-zoe-letra-youtubemp3free.org.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <div class="card">
+        <h1>Feliz San Valentín</h1>
+
+        <div class="mensaje-amistad">
+            <span>✨ Nayelly ✨</span><br>
+            Una amistad verdadera es apoyo, confianza y momentos felices.<br>
+            Gracias por ser mi mejor amiga y por siempre estar conmigo.<br><br>
+            Que este Día de San Valentín esté lleno de alegría,<br>
+            como la que tú siempre regalas. 💜<br><br>
+            ¡Feliz Día de San Valentín! ING
+        </div>
+
+        <!-- Álbum de fotos animado -->
+        <div class="album-container">
+            <div class="foto-actual" id="fotoActual">
+                <img id="albumImg" src="20250804_112846.jpg" alt="Foto Nayelly">
+            </div>
+        </div>
+
+        <!-- Control de música -->
+        <div class="control-musica" id="controlMusica">
+            <span class="icono-musica" id="iconoMusica">🔊</span>
+            <span class="estado-musica" id="textoMusica">Sonido activado</span>
+        </div>
+        <div class="texto-musica">♫ Zoé - Labios Rotos ♫</div>
+
+        <div class="dedicatoria">
+            💐 Con todo mi cariño, para Nayelly 💐
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const container = document.getElementById('corazonesContainer');
+            
+            // ÁLBUM DE FOTOS ANIMADO
+            const imagenes = [
+                '20250804_112846.jpg',
+                'PSX_1754331286286.jpg',
+                'IMG-20250723-WA0091~3.jpg',
+                'IMG-20241214-WA0100.jpg',
+                'IMG_2035.jpg'
+            ];
+            
+            let indiceActual = 0;
+            const albumImg = document.getElementById('albumImg');
+            
+            // Cambiar imagen cada 1.5 segundos
+            setInterval(() => {
+                indiceActual = (indiceActual + 1) % imagenes.length;
+                albumImg.src = imagenes[indiceActual];
+                // Pequeña animación de fade
+                albumImg.style.opacity = '0.7';
+                setTimeout(() => {
+                    albumImg.style.opacity = '1';
+                }, 150);
+            }, 1500);
+
+            // CONTROL DE MÚSICA
+            const audio = document.getElementById('audioFondo');
+            const controlMusica = document.getElementById('controlMusica');
+            const iconoMusica = document.getElementById('iconoMusica');
+            const textoMusica = document.getElementById('textoMusica');
+            
+            let musicaActiva = true;
+
+            controlMusica.addEventListener('click', function() {
+                if (musicaActiva) {
+                    audio.pause();
+                    iconoMusica.textContent = '🔇';
+                    textoMusica.textContent = 'Sonido silenciado';
+                    musicaActiva = false;
+                } else {
+                    audio.play().catch(e => console.log('Error al reproducir'));
+                    iconoMusica.textContent = '🔊';
+                    textoMusica.textContent = 'Sonido activado';
+                    musicaActiva = true;
+                }
+            });
+
+            // Intentar reproducir audio automáticamente
+            function intentarReproducirAudio() {
+                audio.play().catch(e => {
+                    console.log("Autoplay bloqueado, esperando interacción");
+                    textoMusica.textContent = 'Haz clic para activar';
+                    iconoMusica.textContent = '🔇';
+                    musicaActiva = false;
+                });
+            }
+            
+            window.addEventListener('load', intentarReproducirAudio);
+            
+            // Activar audio con el primer clic si está bloqueado
+            document.body.addEventListener('click', function activarPorClick() {
+                if (!musicaActiva && audio.paused) {
+                    audio.play().then(() => {
+                        iconoMusica.textContent = '🔊';
+                        textoMusica.textContent = 'Sonido activado';
+                        musicaActiva = true;
+                    }).catch(e => console.log('Error al reproducir'));
+                }
+            }, { once: true });
+
+            // CORAZONES CADA 1.5 SEGUNDOS
+            const colores = [
+                '#ffb7c5', '#ff9eb5', '#ffa5c3', 
+                '#f9b0c0', '#fba9bb', '#fcb1c9',
+                '#ffb3c6', '#fbc0e0', '#ffc0cb'
+            ];
+
+            const corazones = ['❤️', '💖', '💗', '💘', '💝', '💕', '💞', '🌸', '🌼', '✨'];
+
+            function crearCorazon() {
+                const corazon = document.createElement('div');
+                corazon.classList.add('corazon');
+                
+                const emoji = corazones[Math.floor(Math.random() * corazones.length)];
+                corazon.textContent = emoji;
+                
+                corazon.style.color = colores[Math.floor(Math.random() * colores.length)];
+                
+                const left = Math.random() * 100;
+                corazon.style.left = left + '%';
+                
+                const size = 1.5 + Math.random() * 2.2;
+                corazon.style.fontSize = size + 'rem';
+                
+                const duracion = 5 + Math.random() * 5;
+                corazon.style.animation = `flotar-corazon ${duracion}s linear forwards`;
+                
+                const retardo = Math.random() * 4;
+                corazon.style.animationDelay = retardo + 's';
+                
+                container.appendChild(corazon);
+                
+                setTimeout(() => {
+                    if (corazon.parentNode) corazon.remove();
+                }, (duracion + retardo) * 1000 + 300);
+            }
+
+            // Iniciar corazones automáticos
+            setInterval(crearCorazon, 1500);
+
+            // Crear unos cuantos al inicio
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => crearCorazon(), i * 200);
+            }
+            
+        })();
+    </script>
+</body>
+</html>
